@@ -1,0 +1,4 @@
+# GitHub Manager 依赖包
+
+# HTTP 请求库
+requests>=2.28.0
