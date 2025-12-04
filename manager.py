@@ -462,6 +462,90 @@ class GitHubManager:
             return repo_info
         else:
             raise Exception(f"获取仓库信息失败: {response.json()}")
+    
+    def add_collaborator(self, repo_name: str, username: str, 
+                        permission: str = "push") -> Dict:
+        """
+        向仓库添加协作者
+        
+        Args:
+            repo_name: 仓库名称
+            username: 要添加的GitHub用户名
+            permission: 权限级别 (pull, push, admin, maintain, triage)
+        
+        Returns:
+            操作结果信息
+        """
+        valid_permissions = ["pull", "push", "admin", "maintain", "triage"]
+        if permission not in valid_permissions:
+            raise ValueError(f"无效的权限级别。有效值: {', '.join(valid_permissions)}")
+        
+        data = {
+            "permission": permission
+        }
+        
+        response = requests.put(
+            f"{self.base_url}/repos/{self.username}/{repo_name}/collaborators/{username}",
+            headers=self.headers,
+            json=data
+        )
+        
+        if response.status_code == 201:
+            print(f"✓ 成功添加协作者: {username} (权限: {permission})")
+            print(f"  用户将收到邀请邮件，需要接受邀请后才能访问仓库")
+            return {"status": "invited", "username": username, "permission": permission}
+        elif response.status_code == 204:
+            print(f"✓ 成功更新协作者权限: {username} (权限: {permission})")
+            return {"status": "updated", "username": username, "permission": permission}
+        else:
+            error_msg = response.json()
+            raise Exception(f"添加协作者失败: {error_msg}")
+    
+    def list_collaborators(self, repo_name: str) -> List[Dict]:
+        """
+        列出仓库的所有协作者
+        
+        Args:
+            repo_name: 仓库名称
+        
+        Returns:
+            协作者列表
+        """
+        response = requests.get(
+            f"{self.base_url}/repos/{self.username}/{repo_name}/collaborators",
+            headers=self.headers
+        )
+        
+        if response.status_code == 200:
+            collaborators = response.json()
+            print(f"\n找到 {len(collaborators)} 个协作者:")
+            for collab in collaborators:
+                print(f"  - {collab['login']} (权限: {collab.get('permissions', {})})")
+            return collaborators
+        else:
+            raise Exception(f"获取协作者列表失败: {response.json()}")
+    
+    def remove_collaborator(self, repo_name: str, username: str) -> bool:
+        """
+        从仓库移除协作者
+        
+        Args:
+            repo_name: 仓库名称
+            username: 要移除的GitHub用户名
+        
+        Returns:
+            是否移除成功
+        """
+        response = requests.delete(
+            f"{self.base_url}/repos/{self.username}/{repo_name}/collaborators/{username}",
+            headers=self.headers
+        )
+        
+        if response.status_code == 204:
+            print(f"✓ 成功移除协作者: {username}")
+            return True
+        else:
+            raise Exception(f"移除协作者失败: {response.json()}")
 
 
 def main():
@@ -500,6 +584,15 @@ def main():
   
   # 查看仓库信息
   python github_manager.py repo-info my-project
+  
+  # 添加协作者
+  python github_manager.py add-collaborator my-project developer-username --permission push
+  
+  # 列出协作者
+  python github_manager.py list-collaborators my-project
+  
+  # 移除协作者
+  python github_manager.py remove-collaborator my-project developer-username
         """
     )
     
@@ -586,6 +679,24 @@ def main():
     repo_info_parser = subparsers.add_parser("repo-info", help="获取仓库信息")
     repo_info_parser.add_argument("repo", help="仓库名称")
     
+    # 添加协作者
+    add_collab_parser = subparsers.add_parser("add-collaborator", help="添加协作者")
+    add_collab_parser.add_argument("repo", help="仓库名称")
+    add_collab_parser.add_argument("username", help="要添加的GitHub用户名")
+    add_collab_parser.add_argument("--permission", 
+                                   choices=["pull", "push", "admin", "maintain", "triage"],
+                                   default="push", 
+                                   help="权限级别 (默认: push)")
+    
+    # 列出协作者
+    list_collab_parser = subparsers.add_parser("list-collaborators", help="列出所有协作者")
+    list_collab_parser.add_argument("repo", help="仓库名称")
+    
+    # 移除协作者
+    remove_collab_parser = subparsers.add_parser("remove-collaborator", help="移除协作者")
+    remove_collab_parser.add_argument("repo", help="仓库名称")
+    remove_collab_parser.add_argument("username", help="要移除的GitHub用户名")
+    
     args = parser.parse_args()
     
     if not args.command:
@@ -653,6 +764,15 @@ def main():
         
         elif args.command == "repo-info":
             gh.get_repository_info(args.repo)
+        
+        elif args.command == "add-collaborator":
+            gh.add_collaborator(args.repo, args.username, args.permission)
+        
+        elif args.command == "list-collaborators":
+            gh.list_collaborators(args.repo)
+        
+        elif args.command == "remove-collaborator":
+            gh.remove_collaborator(args.repo, args.username)
         
     except Exception as e:
         print(f"\n错误: {e}")
