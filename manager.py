@@ -984,8 +984,10 @@ def main():
   # 查看运行详情
   python manager.py get-run my-project 9876543210
   
-  # 触发 workflow 运行
+  # 触发 workflow 运行（指定分支）
   python manager.py trigger-workflow my-project ci.yml --ref main
+  python manager.py trigger-workflow my-project ci.yml --branch develop
+  python manager.py trigger-workflow my-project ci.yml -b feature/new-feature
   python manager.py trigger-workflow my-project deploy.yml --ref main --inputs '{"environment":"production"}'
   
   # 取消运行
@@ -1141,7 +1143,8 @@ def main():
     trigger_workflow_parser = subparsers.add_parser("trigger-workflow", help="手动触发 Workflow")
     trigger_workflow_parser.add_argument("repo", help="仓库名称")
     trigger_workflow_parser.add_argument("workflow_id", help="Workflow ID 或文件名")
-    trigger_workflow_parser.add_argument("--ref", default="main", help="分支或标签名 (默认: main)")
+    trigger_workflow_parser.add_argument("--ref", "--branch", "-b", dest="ref", default="main", 
+                                        help="分支或标签名 (默认: main)，可使用 --ref、--branch 或 -b")
     trigger_workflow_parser.add_argument("--inputs", help="输入参数 (JSON 格式)")
     
     # 取消运行
