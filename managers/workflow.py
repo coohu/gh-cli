@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from ..core.client import GitHubClient
+from core.client import GitHubClient
 
 class WorkflowManager:
     def __init__(self, client: GitHubClient):
@@ -78,4 +78,3 @@ class WorkflowManager:
         )
         print(f"✓ 已请求取消运行: {run_id}")
         return True
-

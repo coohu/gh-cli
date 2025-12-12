@@ -1,7 +1,7 @@
 import sys
-from .config import Config
-from .cli.parser import create_parser
-from .cli.commands import CommandHandler
+from config import Config
+from cli.parser import create_parser
+from cli.commands import CommandHandler
 
 
 def main():

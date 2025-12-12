@@ -2,7 +2,7 @@
 import requests
 from typing import Optional, Dict, Any
 from .exceptions import AuthenticationError, APIError
-from ..config import Config
+from config import Config
 
 class GitHubClient:
     def __init__(self, token: str, username: Optional[str] = None):
@@ -56,4 +56,3 @@ class GitHubClient:
                 )
         except requests.exceptions.RequestException as e:
             raise APIError(f"网络请求错误: {str(e)}")
-

@@ -1,13 +1,9 @@
-"""命令处理器"""
-from ..core.client import GitHubClient
-from ..managers.repository import RepositoryManager
-from ..managers.file import FileManager
-from ..managers.workflow import WorkflowManager
-
+from core.client import GitHubClient
+from managers.repository import RepositoryManager
+from managers.file import FileManager
+from managers.workflow import WorkflowManager
 
 class CommandHandler:
-    """命令处理器"""
-    
     def __init__(self, token: str):
         self.client = GitHubClient(token)
         self.repo_manager = RepositoryManager(self.client)
@@ -65,4 +61,3 @@ class CommandHandler:
             args.ref,
             inputs
         )
-

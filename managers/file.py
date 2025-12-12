@@ -1,7 +1,7 @@
 
 import base64
 from typing import Dict
-from ..core.client import GitHubClient
+from core.client import GitHubClient
 
 class FileManager:
     def __init__(self, client: GitHubClient):

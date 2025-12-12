@@ -1,6 +1,6 @@
 
 from typing import Dict, List, Optional
-from ..core.client import GitHubClient
+from core.client import GitHubClient
 
 class RepositoryManager:
     def __init__(self, client: GitHubClient):
