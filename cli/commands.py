@@ -30,6 +30,12 @@ class CommandHandler:
             args.private,
             not args.no_init
         )
+
+    def handle_fork_repo(self, args):
+        self.repo_manager.fork(
+            args.owner,
+            args.repo_name
+        )
     
     def handle_list_repos(self, args):
         """处理列出仓库命令"""

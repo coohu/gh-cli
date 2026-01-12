@@ -118,7 +118,7 @@ def _add_repository_commands(subparsers):
         description="将其他用户的仓库 Fork 到你的账户"
     )
     fork_repo.add_argument("owner", help="要 Fork 的仓库的拥有者")
-    fork_repo.add_argument("repo", help="要 Fork 的仓库名称")
+    fork_repo.add_argument("repo_name", help="要 Fork 的仓库名称")
     
     # 列出仓库
     list_repos = subparsers.add_parser(
